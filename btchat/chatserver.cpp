@@ -121,7 +121,7 @@ void ChatServer::startServer(const QBluetoothAddress& localAdapter)
     //! [Register service]
 }
 
-//! [stopServer]
+//! [stopServer]()
 void ChatServer::stopServer()
 {
     // Unregister service
