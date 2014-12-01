@@ -44,7 +44,9 @@ bool Client::_connect()
 //send socket message
 void Client::sendmsg(char *cltline)
 {
-    write(sockfd,cltline,strlen(cltline));
+    int revalue;
+   if((revalue=write(sockfd,cltline,strlen(cltline)))<0)
+       err_msg("write erro");
 
 }
 struct thread_info {    /* Used as argument to thread_start() */
@@ -89,7 +91,7 @@ void* Client::str_cli()
     char* recvline;
 
     // long _sockfd=(long)para;
-    int sockfd=(int)sockfd;
+   // int sockfd=(int)sockfd;
     //         FD_SET(
     fd_set fset;
     FD_ZERO(&fset);
@@ -97,45 +99,47 @@ void* Client::str_cli()
     while(true)
     {
         //send message to socket if there some
-        if(!Client::send_queue.empty())
+     //   if(!Client::send_queue.empty())
         {
-            sendmsg(Client::send_queue.front());
-            Client::send_queue.pop();
+          // recevive from socket
+            FD_SET(sockfd,&fset);
+            int maxfdp;
+            maxfdp=sockfd+1;
+            struct timeval outtime;
+            outtime.tv_sec=2;
+            outtime.tv_usec=500;
+            int fd=select(maxfdp,&fset,NULL,NULL,NULL);
             //  Client::send_queue.pop();
-        }
 
-        // recevive from socket
-        FD_SET(sockfd,&fset);
-        int maxfdp;
-        maxfdp=sockfd+1;
-        struct timeval outtime;
-        outtime.tv_sec=0;
-        outtime.tv_usec=500;
-        int fd=select(maxfdp,&fset,NULL,NULL,&outtime);
+          //  sendmsg(Client::send_queue.front());
+       //     Client::send_queue.pop();
+            int output_count=0;
 
-        if(fd>0 && FD_ISSET(sockfd,&fset))
-        {
-            //signal from socket
-            int n;
-            recvline=new char[MAXSIZE];
-            if((n=read(sockfd,recvline,MAXLINE))>0)
-                Client::rcv_queue.push(recvline);//addto_queue(recvline); //write text area
-            else if(n==0)
+            if(fd>0 && FD_ISSET(sockfd,&fset))
             {
-                if(stdioeof==1)
-                    pthread_exit(NULL);
+                //signal from socket
+                int n;
+                recvline=new char[MAXSIZE];
+                if((n=read(sockfd,recvline,MAXLINE))>0)
+                    Client::rcv_queue.push(recvline);//addto_queue(recvline); //write text area
+                else if(n==0)
+                {
+                    if(stdioeof==1)
+                        pthread_exit(NULL);
 
+                    else
+                        err_quit("server is terminated!");
+                }
                 else
-                    err_quit("server is terminated!");
-            }
-            else
-            {
-                //err happened; do something
-            }
+                {
+                    //err happened; do something
+                }
 #ifdef DEBUG
-            std::cout<<"rcvqueue count:"<< rcv_queue.size()<<std::endl;
+            //   qDebug() <<"rcvqueue count:"<< rcv_queue.size()<<std::endl;
+               output_count++;
 #endif
 
+            }
         }
         //send message if exist
     }
@@ -159,10 +163,13 @@ void
 
 */
 
-void Client::popfrom_rcv(char* top)
+char* & Client::popfrom_rcv(char* &top)
 {
+ //   std::cout<<rrv_queue.front<<std::endl;
     top=rcv_queue.front();
+    char* &temp=top;
     rcv_queue.pop();
+    return temp;
 }
 bool Client::pushto_send(char* recvline)
 {

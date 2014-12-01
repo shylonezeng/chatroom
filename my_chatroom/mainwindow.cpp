@@ -62,10 +62,11 @@ void MainWindow::sendMessage()
     char *str=new char[MAXSIZE];
     const char *temp = msg.toLocal8Bit().data();
     sprintf(str,"socketfd %d: %s",clt.getsockfd(),temp);
-    clt.pushto_send(str);
+   // clt.pushto_send(str);
+    clt.sendmsg(str);
 #ifdef DEBUG
    // wtochat(QString("sendqueue count:"+clt.sendmsg()));
-    std::cout<<"sendqueue count:"<<clt.send_queue.size();
+    std::cout<<"sendqueue count:"<<clt.send_queue.size()<<std::endl;
 #endif
     //  wtochat(str);
 }
@@ -78,6 +79,7 @@ void MainWindow::quit_and_exit()
 {
     //close connection and deallocate
     erro("quit and exit");
+    this->clt.disconnect();
     accept();
 
 }

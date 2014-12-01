@@ -11,6 +11,7 @@
 #include <error.h>
 #include <QString>
 #include <time.h>
+#include <QDebug>
 #define MAXSIZE 1024
 #define localhost "127.0.0.1"
 #define IPLEN 20
@@ -39,7 +40,7 @@ public:
     // void
 public:
     //operate with recieve and send queue
-    void  popfrom_rcv(char*);
+    char* &  popfrom_rcv(char*&);
     bool pushto_send(char*);
     int getsockfd(){return sockfd; }
 private:
