@@ -45,7 +45,7 @@ int main(int argc,char** argv)
 			axtime=statbuf.st_atime;
 		}
 		signal(SIGALRM,wakeup);
-		alarm(606060606060);
+		alarm(60);
 		pause();
 	}
 	return 0;
