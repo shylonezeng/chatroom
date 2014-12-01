@@ -11,8 +11,11 @@ char *filename;
 void wakeup(int sig)
 {
 	char timestr[50];
+	time_t rtime;
+	time(&rtime);
+	printf("现在时间：%s",ctime(&rtime));
 // 	if(!timespec2str(timestr,30,axtime))	
-	printf("time of last access to file %s: %s",filename,ctime(&axtime));
+	printf("\t文件%s最后被访问的时间: %s",filename,ctime(&axtime));
 }
 
 int main(int argc,char** argv)
@@ -42,7 +45,7 @@ int main(int argc,char** argv)
 			axtime=statbuf.st_atime;
 		}
 		signal(SIGALRM,wakeup);
-		alarm(60);
+		alarm(606060606060);
 		pause();
 	}
 	return 0;
